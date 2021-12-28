@@ -3,7 +3,7 @@ const { Schema, model } = require("mongoose");
 const profileSchema = new Schema({
   user: {
     type: Schema.Types.ObjectId,
-    ref: "Users",
+    ref: "User",
   },
   handle: {
     type: String,
@@ -23,7 +23,6 @@ const profileSchema = new Schema({
   },
   bio: {
     type: String,
-    required: true,
   },
   githubUsername: String,
   experience: {
