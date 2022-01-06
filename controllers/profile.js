@@ -113,7 +113,7 @@ exports.getProfileByUserId = (req, res, next) => {
     );
 };
 
-// Get all profile
+// Get all Profile
 // route  : GET /api/profile/all
 // access : Public
 exports.getAllProfiles = (req, res, next) => {
