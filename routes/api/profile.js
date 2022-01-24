@@ -8,7 +8,10 @@ const {
   getProfileByUserId,
   getAllProfiles,
   addNewExperience,
-  addNewEducation
+  addNewEducation,
+  deleteEducation,
+  deleteExperience,
+  deleteProfile,
 } = require("../../controllers/profile");
 
 // Get logged in users profile
@@ -60,6 +63,33 @@ router.post(
   "/education",
   passport.authenticate("jwt", { session: false }),
   addNewEducation
+);
+
+// Delete an education
+// route  : Delete /api/profile/education/:edu_id
+// access : Private
+router.delete(
+  "/education/:edu_id",
+  passport.authenticate("jwt", { session: false }),
+  deleteEducation
+);
+
+// Delete an experience
+// route  : Delete /api/profile/experience/:exp_id
+// access : Private
+router.delete(
+  "/experience/:exp_id",
+  passport.authenticate("jwt", { session: false }),
+  deleteExperience
+);
+
+// Delete Profile and user
+// route  : Delete /api/profile
+// access : Private
+router.delete(
+  "/",
+  passport.authenticate("jwt", { session: false }),
+  deleteProfile
 );
 
 module.exports = router;

@@ -1,4 +1,5 @@
 const Profile = require("../models/Profile");
+const User = require("../models/User");
 const validateProfileInput = require("../validation/profile");
 const validateExperienceInput = require("../validation/experience");
 const validateEducationInput = require("../validation/education");
@@ -29,8 +30,6 @@ exports.createUserProfile = (req, res, next) => {
   if (req.body.skills !== undefined) {
     profileFields.skills = req.body.skills.split(",");
   }
-  console.log(req.body.handle, req.body.status);
-  console.log(profileFields);
   //Social
   profileFields.social = {};
   if (req.body.youtube) profileFields.social.youtube = req.body.youtube;
@@ -127,7 +126,11 @@ exports.getAllProfiles = (req, res, next) => {
         errors.noprofile = "There is no profiles";
         res.status(404).json(errors);
       }
-      res.json(profile);
+      res.json({
+        success:true,
+        length:profile.length,
+        data:profile
+      });
     })
     .catch((err) => res.status(404).json(err));
 };
@@ -171,8 +174,6 @@ exports.addNewExperience = (req, res, next) => {
     .catch((err) => res.status(500).json({ success: false, data: err }));
 };
 
-
-
 // Add education to profile
 // route  : POST /api/profile/education
 // access : Private
@@ -207,6 +208,64 @@ exports.addNewEducation = (req, res, next) => {
       profile
         .save()
         .then((profile) => res.json(profile))
+        .catch((err) => res.status(500).json({ success: false, data: err }));
+    })
+    .catch((err) => res.status(500).json({ success: false, data: err }));
+};
+
+// Delete an experience
+// route  : DELETE /api/profile/experience/:exp_id
+// access : Private
+
+exports.deleteExperience = (req, res, next) => {
+  Profile.findOne({ user: req.user.id })
+    .then((profile) => {
+      //Get remove index
+      const removeIndex = profile.experience
+        .map((item) => item._id)
+        .indexOf(req.params.exp_id);
+      profile.experience.splice(removeIndex, 1);
+      profile
+        .save()
+        .then((profile) => res.json({ success: true, data: profile }))
+        .catch((err) => res.status(500).json({ success: false, data: err }));
+    })
+    .catch((err) => res.status(500).json({ success: false, data: err }));
+};
+
+// Delete an education
+// route  : DELETE /api/profile/education/:edu_id
+// access : Private
+
+exports.deleteEducation = (req, res, next) => {
+  Profile.findOne({ user: req.user.id })
+    .then((profile) => {
+      //Get remove index
+      const removeIndex = profile.education
+        .map((item) => item._id)
+        .indexOf(req.params.edu_id);
+      profile.education.splice(removeIndex, 1);
+      profile
+        .save()
+        .then((profile) => res.json({ success: true, data: profile }))
+        .catch((err) => res.status(500).json({ success: false, data: err }));
+    })
+    .catch((err) => res.status(500).json({ success: false, data: err }));
+};
+
+// Delete Profile and user
+// route  : Delete /api/profile
+// access : Private
+exports.deleteProfile = (req, res, next) => {
+  Profile.findOneAndRemove({ user: req.user.id })
+    .then(() => {
+      User.findByIdAndRemove(req.user.id)
+        .then(() => {
+          res.json({
+            success: false,
+            data: { message: "Profile and user removed successfully" },
+          });
+        })
         .catch((err) => res.status(500).json({ success: false, data: err }));
     })
     .catch((err) => res.status(500).json({ success: false, data: err }));
