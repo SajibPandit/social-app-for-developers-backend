@@ -1,5 +1,7 @@
 const Profile = require("../models/Profile");
 const validateProfileInput = require("../validation/profile");
+const validateExperienceInput = require("../validation/experience");
+const validateEducationInput = require("../validation/education");
 
 // Create/Edit user profile
 // route  : POST /api/profile
@@ -128,4 +130,84 @@ exports.getAllProfiles = (req, res, next) => {
       res.json(profile);
     })
     .catch((err) => res.status(404).json(err));
+};
+
+// Add experience to profile
+// route  : POST /api/profile/experience
+// access : Private
+
+exports.addNewExperience = (req, res, next) => {
+  const { errors, isValid } = validateExperienceInput(req.body);
+  //Check Validation
+  if (!isValid) {
+    return res.status(400).json({
+      success: false,
+      data: errors,
+    });
+  }
+
+  Profile.findOne({ user: req.user.id })
+    .then((profile) => {
+      const newExp = {
+        title: req.body.title,
+        company: req.body.company,
+        location: req.body.location,
+        from: req.body.from,
+        to: req.body.to,
+        current: req.body.current,
+        description: req.body.description,
+      };
+
+      console.log(req.user.id);
+
+      //Add to experience array
+      profile.experience.unshift(newExp);
+      console.log(newExp);
+      profile
+        .save()
+        .then((profile) => res.json(profile))
+        .catch((err) => res.status(500).json({ success: false, data: err }));
+    })
+    .catch((err) => res.status(500).json({ success: false, data: err }));
+};
+
+
+
+// Add education to profile
+// route  : POST /api/profile/education
+// access : Private
+
+exports.addNewEducation = (req, res, next) => {
+  const { errors, isValid } = validateEducationInput(req.body);
+  //Check Validation
+  if (!isValid) {
+    return res.status(400).json({
+      success: false,
+      data: errors,
+    });
+  }
+
+  Profile.findOne({ user: req.user.id })
+    .then((profile) => {
+      const newEdu = {
+        school: req.body.school,
+        degree: req.body.degree,
+        fieldofstudy: req.body.fieldofstudy,
+        from: req.body.from,
+        to: req.body.to,
+        current: req.body.current,
+        description: req.body.description,
+      };
+
+      console.log(req.user.id);
+
+      //Add to education array
+      profile.education.unshift(newEdu);
+      console.log(newEdu);
+      profile
+        .save()
+        .then((profile) => res.json(profile))
+        .catch((err) => res.status(500).json({ success: false, data: err }));
+    })
+    .catch((err) => res.status(500).json({ success: false, data: err }));
 };

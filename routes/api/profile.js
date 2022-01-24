@@ -7,6 +7,8 @@ const {
   getProfileByHandle,
   getProfileByUserId,
   getAllProfiles,
+  addNewExperience,
+  addNewEducation
 } = require("../../controllers/profile");
 
 // Get logged in users profile
@@ -41,5 +43,23 @@ router.get("/user/:user_id", getProfileByUserId);
 // route  : GET /api/profile/all
 // access : Public
 router.get("/all", getAllProfiles);
+
+// Add experience to profile
+// route  : POST /api/profile/experience
+// access : Private
+router.post(
+  "/experience",
+  passport.authenticate("jwt", { session: false }),
+  addNewExperience
+);
+
+// Add education to profile
+// route  : POST /api/profile/education
+// access : Private
+router.post(
+  "/education",
+  passport.authenticate("jwt", { session: false }),
+  addNewEducation
+);
 
 module.exports = router;
